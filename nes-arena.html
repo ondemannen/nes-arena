@@ -1,8 +1,10 @@
-<HTML>
-<HEAD>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-</HEAD>
-<BODY>
+</head>
+<body>
 <h1>Resultater - Nes Arena</h1>
 Klasse: <select id="klasse"></select>
 Øvelse: <select id="øvelse"></select>
@@ -11,16 +13,37 @@ Klasse: <select id="klasse"></select>
 </HTML>
 <script>
 $(document).ready(function() {
-	var g_url = "https://docs.google.com/spreadsheets/d/1zA44L7hW48u4mY8RAxR3xK11XJn6eSExLoXHG6mN4gc/pub?gid=1277651390&single=true&output=tsv&callback=?";
 	var res = [];
 	var a_class = [];
 	var a_event = [];
 	var a_name = [];
-	$.get(g_url, function(v) {
-		var lines = v.split(/\n/);
+	var g_url = "https://docs.google.com/spreadsheets/d/1zA44L7hW48u4mY8RAxR3xK11XJn6eSExLoXHG6mN4gc/pub?gid=1277651390&single=true&output=tsv";
+	var page;
+	function createCORSRequest(method, url) {
+		var xhr = new XMLHttpRequest();
+		if ("withCredentials" in xhr) {
+			// Check if the XMLHttpRequest object has a "withCredentials" property.
+			// "withCredentials" only exists on XMLHTTPRequest2 objects.
+			xhr.open(method, url, true);
+		} else if (typeof XDomainRequest != "undefined") {
+			// Otherwise, check if XDomainRequest.
+			// XDomainRequest only exists in IE, and is IE's way of making CORS requests.
+			xhr = new XDomainRequest();
+			xhr.open(method, url);
+		} else {
+			// Otherwise, CORS is not supported by the browser.
+			xhr = null;
+		}
+		return xhr;
+	}
+	var v = createCORSRequest('GET', g_url);
+	if (!v) { throw new Error('CORS not supported'); }
+	v.onload = function() {
+		var rt = v.responseText;
+		console.log(rt);
+		var lines = rt.split(/\n/);
 		console.log("Lines: " + lines.length);
 		for(var i = 1; i < lines.length; i++) {
-			//console.log(lines[i]);
 			var w = lines[i].split(/\t/);
 			var tmp = {};
 			tmp.stevne = w[0];
@@ -35,7 +58,6 @@ $(document).ready(function() {
 			if($.inArray(tmp.øvelse,a_name) === -1) a_name.push(tmp.name);
 			if($.inArray(tmp.øvelse,a_event) === -1) a_event.push(tmp.øvelse);
 			if($.inArray(tmp.klasse,a_class) === -1) a_class.push(tmp.klasse);
-			//console.log(tmp);
 			res.push(tmp);
 		}
 		var tmp = a_event.sort();
@@ -52,13 +74,15 @@ $(document).ready(function() {
 				value: tmp[i],
 			}));
 		}
-	});
+	};
+	v.onerror = function() { console.log('There was an error!'); };
+	v.send();
+
 	$("select#klasse").on("change", function(e) { find_best() });
 	$("select#øvelse").on("change", function(e) { find_best() });
 	function find_best() {
 		var klasse = $("select#klasse :selected").text();
 		var øvelse = $("select#øvelse :selected").text();
-		//console.log(klasse,øvelse);
 		var best = {};
 		for(var i = 0 ; i < res.length; i++) {
 			if(res[i].klasse == klasse && res[i].øvelse == øvelse) {
