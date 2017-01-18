@@ -6,8 +6,8 @@
 </head>
 <body>
 <h1>Resultater - Nes Arena</h1>
-Klasse: <select id="klasse"></select>
-Øvelse: <select id="øvelse"></select>
+Klasse: <select id="klasse"><option>Velg klasse</option></select>
+Øvelse: <select id="øvelse"><option>Velg øvelse</option></select>
 <div id="resultat"></div>
 </BODY>
 </HTML>
@@ -27,19 +27,11 @@ $(document).ready(function() {
 			res.push(val);
 		});
 		var tmp = a_event.sort();
-		for(var i = 0; i < tmp.length; i++) {
-			$('select#øvelse').append($('<option>', {
-				text : tmp[i],
-				value: tmp[i],
-			}));
-		}
+		for(var i = 0; i < tmp.length; i++) $('select#øvelse').append($('<option>', { text : tmp[i] }));
+
 		var tmp = a_class.sort();
-		for(var i = 0; i < tmp.length; i++) {
-			$('select#klasse').append($('<option>', {
-				text : tmp[i],
-				value: tmp[i],
-			}));
-		}
+		for(var i = 0; i < tmp.length; i++) $('select#klasse').append($('<option>', { text : tmp[i] }));
+
 	});
 
 	$("select#klasse").on("change", function(e) { find_best() });
@@ -47,6 +39,7 @@ $(document).ready(function() {
 	function find_best() {
 		var klasse = $("select#klasse :selected").text();
 		var øvelse = $("select#øvelse :selected").text();
+		console.log(klasse,øvelse);
 		var best = {};
 		for(var i = 0 ; i < res.length; i++) {
 			if(res[i].klasse == klasse && res[i].øvelse == øvelse) {
@@ -74,6 +67,6 @@ $(document).ready(function() {
 			$('div#resultat').text('Mangler deltaker');
 		}
 	}
-	$("select#klasse").change();
+	find_best();
 }); 
 </script>
