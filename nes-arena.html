@@ -18,30 +18,14 @@ $(document).ready(function() {
 	var a_event = [];
 	var a_name = [];
 	var g_url = "nes-arena.json";
-	$.getJSON( "ajax/test.json", function( data ) {
+	$.getJSON(g_url, function( data ) {
 		var items = [];
 		$.each( data, function( key, val ) {
-			console.log(key,val);
+			if($.inArray(val.navn,a_name) === -1) a_name.push(val.navn);
+			if($.inArray(val.øvelse,a_event) === -1) a_event.push(val.øvelse);
+			if($.inArray(val.klasse,a_class) === -1) a_class.push(val.klasse);
+			res.push(val);
 		});
-		var lines = rt.split(/\n/);
-		console.log("Lines: " + lines.length);
-		for(var i = 1; i < lines.length; i++) {
-			var w = lines[i].split(/\t/);
-			var tmp = {};
-			tmp.stevne = w[0];
-			tmp.dato = w[1];
-			tmp.øvelse = w[2];
-			tmp.klasse = w[3];
-			tmp.årsklasse = w[4];
-			tmp.navn = w[5];
-			tmp.klubb = w[6];
-			tmp.resultat = w[7];
-			tmp.enhet = w[8];
-			if($.inArray(tmp.øvelse,a_name) === -1) a_name.push(tmp.name);
-			if($.inArray(tmp.øvelse,a_event) === -1) a_event.push(tmp.øvelse);
-			if($.inArray(tmp.klasse,a_class) === -1) a_class.push(tmp.klasse);
-			res.push(tmp);
-		}
 		var tmp = a_event.sort();
 		for(var i = 0; i < tmp.length; i++) {
 			$('select#øvelse').append($('<option>', {
@@ -57,8 +41,6 @@ $(document).ready(function() {
 			}));
 		}
 	});
-	v.onerror = function() { console.log('There was an error!'); };
-	v.send();
 
 	$("select#klasse").on("change", function(e) { find_best() });
 	$("select#øvelse").on("change", function(e) { find_best() });
