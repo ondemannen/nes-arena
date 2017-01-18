@@ -17,30 +17,12 @@ $(document).ready(function() {
 	var a_class = [];
 	var a_event = [];
 	var a_name = [];
-	var g_url = "https://docs.google.com/spreadsheets/d/1zA44L7hW48u4mY8RAxR3xK11XJn6eSExLoXHG6mN4gc/pub?gid=1277651390&single=true&output=tsv";
-	var page;
-	function createCORSRequest(method, url) {
-		var xhr = new XMLHttpRequest();
-		if ("withCredentials" in xhr) {
-			// Check if the XMLHttpRequest object has a "withCredentials" property.
-			// "withCredentials" only exists on XMLHTTPRequest2 objects.
-			xhr.open(method, url, true);
-		} else if (typeof XDomainRequest != "undefined") {
-			// Otherwise, check if XDomainRequest.
-			// XDomainRequest only exists in IE, and is IE's way of making CORS requests.
-			xhr = new XDomainRequest();
-			xhr.open(method, url);
-		} else {
-			// Otherwise, CORS is not supported by the browser.
-			xhr = null;
-		}
-		return xhr;
-	}
-	var v = createCORSRequest('GET', g_url);
-	if (!v) { throw new Error('CORS not supported'); }
-	v.onload = function() {
-		var rt = v.responseText;
-		console.log(rt);
+	var g_url = "nes-arena.json";
+	$.getJSON( "ajax/test.json", function( data ) {
+		var items = [];
+		$.each( data, function( key, val ) {
+			console.log(key,val);
+		});
 		var lines = rt.split(/\n/);
 		console.log("Lines: " + lines.length);
 		for(var i = 1; i < lines.length; i++) {
@@ -74,7 +56,7 @@ $(document).ready(function() {
 				value: tmp[i],
 			}));
 		}
-	};
+	});
 	v.onerror = function() { console.log('There was an error!'); };
 	v.send();
 
