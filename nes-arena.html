@@ -39,7 +39,7 @@ $(document).ready(function() {
 	function find_best() {
 		var klasse = $("select#klasse :selected").text();
 		var øvelse = $("select#øvelse :selected").text();
-		console.log(klasse,øvelse);
+		//console.log(klasse,øvelse);
 		var best = {};
 		for(var i = 0 ; i < res.length; i++) {
 			if(res[i].klasse == klasse && res[i].øvelse == øvelse) {
@@ -51,7 +51,6 @@ $(document).ready(function() {
 				else if(res[i].enhet == 1)
 					if(res[i].resultat > best.resultat)
 						best = res[i];
-				console.log(res[i].navn, best.navn)
 			}
 		}
 		if(best.navn) {
