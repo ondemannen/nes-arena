@@ -6,13 +6,21 @@
 </head>
 <body>
 <h1>Resultater - Nes Arena</h1>
+<div style="float:left;">
 Klasse: <select id="klasse"><option>Velg klasse</option></select>
 Øvelse: <select id="øvelse"><option>Velg øvelse</option></select>
 <div id="resultat"></div>
+</div>
+<div style="float:left;">
+Utøver: <select id="utøver"><option value="-1">Velg utøver</option></select>
+<div id="utøver"></div>
+</div>
 </BODY>
 </HTML>
 <script>
 $(document).ready(function() {
+	var g_kule = {10:2,11:2,12:3,13:3,14:4,15:4,16:5,17:5,18:6,junior:7.26,MS:7.26};
+	var j_kule = {10:2,11:2,12:2,13:2,14:3,15:3,16:3,17:4,18:4,junior:4,KS:4};
 	var res = [];
 	var a_class = [];
 	var a_event = [];
@@ -26,6 +34,9 @@ $(document).ready(function() {
 			if($.inArray(val.klasse,a_class) === -1) a_class.push(val.klasse);
 			res.push(val);
 		});
+		var tmp = a_name.sort();
+		for(var i = 0; i < tmp.length; i++) $('select#utøver').append($('<option>', { text : tmp[i] }));
+
 		var tmp = a_event.sort();
 		for(var i = 0; i < tmp.length; i++) $('select#øvelse').append($('<option>', { text : tmp[i] }));
 
@@ -33,9 +44,51 @@ $(document).ready(function() {
 		for(var i = 0; i < tmp.length; i++) $('select#klasse').append($('<option>', { text : tmp[i] }));
 
 	});
-
+	console.log(res);
 	$("select#klasse").on("change", function(e) { find_best() });
 	$("select#øvelse").on("change", function(e) { find_best() });
+	$("select#utøver").on("change", function(e) { find_athlete() });
+	function finn_kule(cls, res) {
+		var nn = cls.replace(/^\D+/g,'');
+		console.log(cls,res,nn);
+		if(cls.match(/^(J|KS)/i)) return res + ' ('+j_kule[nn]+'kg)';
+		if(cls.match(/^(G|MS)/i)) return res + ' ('+g_kule[nn]+'kg)';
+		return res;
+	}
+	function find_athlete() {
+		if($("select#utøver :selected").val() == -1) {
+			$('div#utøver').html('Velg en utøver');
+		} else {
+			var athlete = $("select#utøver :selected").text();
+			best = {};
+			for(var i = 0 ; i < res.length; i++) {
+				if(res[i].navn == athlete) {
+					var tmp = res[i].øvelse;
+					//console.log(res[i].øvelse,res[i].enhet);
+					if(!best[tmp]) {
+						best[tmp] = res[i];
+					} else if(best[tmp].resultat < res[i].resultat && res[i].enhet == 1) {
+						best[tmp] = res[i];
+					} else if(best[tmp].resultat > res[i].resultat && res[i].enhet == 0) {
+						best[tmp] = res[i];
+					}
+				}
+			}
+			$('div#utøver').html('Mangler data på utøver');
+			var html = '<table>';
+			$.each( best, function( key, val ) {
+				html += '<tr>' +
+					'<td>' + val.stevne + '</td>' +
+				        '<td>' + val.øvelse + '</td>' +
+				        '<td>' + val.klasse + '</td>' +
+					'<td align="right">' + (val.øvelse == "Kule" ? finn_kule(val.klasse, val.resultat) : val.resultat) + '</td>' +
+					'<td>' + val.klubb + '</td>' +
+					'</tr>';
+			});
+			html += '</table>';
+			$('div#utøver').html(html);
+		}
+	}
 	function find_best() {
 		var klasse = $("select#klasse :selected").text();
 		var øvelse = $("select#øvelse :selected").text();
@@ -58,7 +111,7 @@ $(document).ready(function() {
 				'<table>' +
 				'<tr><td><b>Navn</td><td>' + best.navn + '</td></tr>' +
 				'<tr><td><b>Klubb</td><td>' + best.klubb + '</td></tr>' +
-				'<tr><td><b>Resultat</td><td>' + best.resultat + '</td></tr>' +
+				'<tr><td><b>Resultat</td><td>' + (best.øvelse == "Kule" ? finn_kule(best.klasse, best.resultat) : best.resultat) + '</td></tr>' +
 				'<tr><td><b>Stevne</td><td>' + best.stevne + '</td></tr>' +
 				'</table>'
 			);
@@ -66,6 +119,5 @@ $(document).ready(function() {
 			$('div#resultat').text('Mangler deltaker');
 		}
 	}
-	find_best();
 }); 
 </script>
