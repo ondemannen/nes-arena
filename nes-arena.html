@@ -115,6 +115,8 @@ $(document).ready(function() {
 				'<tr><td><b>Stevne</td><td>' + best.stevne + '</td></tr>' +
 				'</table>'
 			);
+			$('select#utøver').val(best.navn);
+			$('select#utøver').change();
 		} else {
 			$('div#resultat').text('Mangler deltaker');
 		}
